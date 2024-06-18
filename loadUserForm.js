@@ -17,4 +17,6 @@ function createMenu() {
 
 }
 
-f
+function onOpen() {
+  createMenu();
+}

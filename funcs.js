@@ -16,4 +16,13 @@ function addNewRow(rowData) {
     "",
     "",
     rowData.recidivist,
-    rowData.progra
+    rowData.program,
+    rowData.specPops,
+    rowData.behContract,
+    rowData.notes
+  ]);
+  return true;
+} else {
+  console.log("rowData is undefined");
+}
+}

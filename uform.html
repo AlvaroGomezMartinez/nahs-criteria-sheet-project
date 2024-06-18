@@ -129,4 +129,33 @@
       }
 
       function afterSubmit(e) {
-   
+        var name = document.getElementById("studentName");
+        name.value = "";
+        var campus = document.getElementById("campusList");
+        campus.value = "";
+        var grade = document.getElementById("inputGroupGradeLevel");
+        grade.value = "";
+        var id = document.getElementById("studentId");
+        id.value = "";
+        var stuOffense = document.getElementById("offense");
+        stuOffense.value = "";
+        var numDaysAssigned = document.getElementById("daysAssigned");
+        numDaysAssigned.value = "";
+        var recidivist = document.getElementById("inputGroupRecidivist");
+        recidivist.value = "";
+        var program = document.getElementById("inputGroupProgram");
+        program.value = "";
+        var specPops = document.getElementById("inputGroupSpecPops");
+        specPops.value = "";
+        var behContract = document.getElementById("inputGroupBehaviorContract");
+        behContract.value = "";
+        var notes = document.getElementById("formControlTextAreaNotes");
+        notes.value = "";
+      }
+
+      document.getElementById("mainButton").addEventListener("click",afterButtonClicked);
+
+    </script>
+
+  </body>
+</html>
