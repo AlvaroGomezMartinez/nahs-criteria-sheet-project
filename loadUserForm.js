@@ -1,7 +1,7 @@
 function loadForm() {
   
   const htmlForSidebar = HtmlService.createTemplateFromFile("uform");
-  const htmlOutput = htmlForSidebar.evaluate();
+  const htmlOutput = htmlForSidebar.evaluate().setTitle("NAHS Student Entry Form");
 
   const ui = SpreadsheetApp.getUi();
   ui.showSidebar(htmlOutput);
@@ -17,6 +17,4 @@ function createMenu() {
 
 }
 
-function onOpen() {
-  createMenu();
-}
+f

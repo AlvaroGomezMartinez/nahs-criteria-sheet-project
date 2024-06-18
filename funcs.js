@@ -1,10 +1,9 @@
 function addNewRow(rowData) {
   if (rowData !== undefined) {
-  const currentDate = new Date();
+  const currentDate = new Date().toLocaleString('en-US');
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const ws = ss.getSheetByName("Active");
-  
   ws.appendRow([
     rowData.name,
     rowData.campus,
@@ -17,12 +16,4 @@ function addNewRow(rowData) {
     "",
     "",
     rowData.recidivist,
-    rowData.program,
-    rowData.specPops,
-    rowData.behContract,
-    rowData.notes
-  ]);
-} else {
-  console.log("rowData is undefined");
-}
-}
+    rowData.progra

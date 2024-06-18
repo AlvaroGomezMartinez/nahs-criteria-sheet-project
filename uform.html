@@ -125,12 +125,8 @@
         var behContract = document.getElementById("inputGroupBehaviorContract");
         var notes = document.getElementById("formControlTextAreaNotes");
         var rowData = {name: name.value, campus: campus.value, grade: grade.value, id: id.value, stuOffense: stuOffense.value, numDaysAssigned: numDaysAssigned.value, recidivist: recidivist.value, program: program.value, specPops: specPops.value, behContract: behContract.value, notes: notes.value}
-        google.script.run.addNewRow(rowData);
+        google.script.run.withSuccessHandler(afterSubmit).addNewRow(rowData);
       }
 
-      document.getElementById("mainButton").addEventListener("click",afterButtonClicked);
-
-    </script>
-
-  </body>
-</html>
+      function afterSubmit(e) {
+   
