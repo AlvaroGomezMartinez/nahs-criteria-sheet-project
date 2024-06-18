@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-    
-  </body>
+<head>
+  <title>NAHS Criteria Sheet</title>
+  <script>
+    function submitForm(action) {
+      var form = document.getElementById('crudForm');
+      form.action = action;
+      form.submit();
+    }
+  </script>
+</head>
+<body>
+  <form id="crudForm" method="post">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+    <label for="age">Age:</label><br>
+    <input type="text" id="age" name="age"><br>
+    <label for="email">Email:</label><br>
+    <input type="text" id="email" name="email"><br>
+    <input type="hidden" id="rowNumber" name="rowNumber">
+  </form>
+  <button onclick="submitForm('/create')">Create</button>
+  <button onclick="submitForm('/read')">Read</button>
+  <button onclick="submitForm('/update')">Update</button>
+  <button onclick="submitForm('/delete')">Delete</button>
+</body>
 </html>
