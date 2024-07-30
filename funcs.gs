@@ -1,3 +1,10 @@
+
+/**
+ * This function loads the data that the clerk enters into the sidebar of the Google Sheets UI.
+ * 
+ * @param {*} rowData
+ * @return {*} 
+ */
 function addNewRow(rowData) {
   if (rowData !== undefined) {
   const currentDate = new Date().toLocaleString('en-US');
