@@ -1,3 +1,6 @@
+/**
+ * This function loads the student entry form in the sidebar of the Google Sheets UI.
+ */
 function loadForm() {
   
   const htmlForSidebar = HtmlService.createTemplateFromFile("uform");
@@ -8,6 +11,10 @@ function loadForm() {
 
 }
 
+
+/**
+ * This function creates a menu item in the Google Sheets UI that allows users to open the student entry form.
+ */
 function createMenu() {
 
   const ui = SpreadsheetApp.getUi();
