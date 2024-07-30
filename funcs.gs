@@ -28,7 +28,7 @@ function addNewRow(rowData) {
     rowData.notes
   ]);
   return true;
-} else {
+  } else {
   console.log("rowData is undefined");
-}
+  }
 }
