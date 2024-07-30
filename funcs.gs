@@ -1,4 +1,3 @@
-
 /**
  * This function loads the data that the clerk enters into the sidebar of the Google Sheets UI.
  * 
