@@ -1,0 +1,8 @@
+# Ignore Git
+.git/*
+
+# Ignore README
+README.md
+
+# Ignore LICENSE
+LICENSE
