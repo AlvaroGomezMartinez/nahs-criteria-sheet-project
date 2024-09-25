@@ -25,7 +25,11 @@ function loadActiveStudentsData() {
     let studentId = row[3];
     if (studentId) {
       studentId = String(studentId).trim();
-      activeStudentDataMap.set(studentId, rowData);
+      if (activeStudentDataMap.has(studentId)) {
+        activeStudentDataMap.get(studentId).push(rowData);
+      } else {
+        activeStudentDataMap.set(studentId, [rowData]);
+      }
     }
   }
 
