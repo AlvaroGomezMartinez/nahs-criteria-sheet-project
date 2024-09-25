@@ -3,7 +3,7 @@
  * of the "Active" sheet and fills the unmerged cells with the value of the top
  * cell in the merged range.
  * 
- * @file unmerge column A.js
+ * @file unmergeColumnA.js
  * @return {void}
  */
 function unmergeAndFillColumnA() {
