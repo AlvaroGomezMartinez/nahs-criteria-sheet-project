@@ -33,8 +33,6 @@ function main() {
   const attendanceData = loadStudentAttendanceData();
   const entryWithdrawalData = loadEntryWithdrawalData();
 
-  unmergeAndFillColumnA();
-
   // Map to store the merged result
   const result = new Map();
 
