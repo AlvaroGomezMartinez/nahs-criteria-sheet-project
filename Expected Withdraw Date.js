@@ -9,7 +9,12 @@
  * @return {Date[][]} - A 2D array of resulting dates after adjusting for school days, holidays, and additional days (e.g., `[[ExpectedDate1], [ExpectedDate2], ...]`).
  * @customfunction
  */
-function EXPECTED_WITHDRAW_DATE(inputDateRange, numberOfDaysRange, holidayRange, additionalDaysRange) {
+function NAHS_EXPECTED_WITHDRAW_DATE(
+  inputDateRange,
+  numberOfDaysRange,
+  holidayRange,
+  additionalDaysRange
+) {
   var output = [];
 
   for (var i = 0; i < inputDateRange.length; i++) {
@@ -23,7 +28,7 @@ function EXPECTED_WITHDRAW_DATE(inputDateRange, numberOfDaysRange, holidayRange,
       output.push([null]);
     } else {
       // Calculate the additional days to be added
-      var additionalDays = (I - H); // Add or remove other calculations as needed
+      var additionalDays = I - H; // Add or remove other calculations as needed
 
       // Update the number of days to be added to inputDate
       numberOfDays += additionalDays;
@@ -56,11 +61,6 @@ function EXPECTED_WITHDRAW_DATE(inputDateRange, numberOfDaysRange, holidayRange,
 
   return output;
 }
-
-
-
-
-
 
 // function EXPECTED_WITHDRAW_DATE(inputDateRange, numberOfDaysRange, holidayRange) {
 //   var output = [];
