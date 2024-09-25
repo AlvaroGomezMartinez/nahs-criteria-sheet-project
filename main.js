@@ -27,19 +27,52 @@
 function main() {
   // Prepare the "Active" sheet for data loading and joining, by unmerging the cells in column A
   unmergeAndFillColumnA();
+
   // Load data for active students, registration, attendance, and enrollment
-  const activeStudents = loadActiveStudentsData();
-  const registrations = loadRegistrationsData();
+  const activeStudentsData = loadActiveStudentsData();
+  const registrationsData = loadRegistrationsData();
   const attendanceData = loadStudentAttendanceData();
   const entryWithdrawalData = loadEntryWithdrawalData();
 
   // Map to store the merged result
   const result = new Map();
 
+  // First join. This is an inner join between activeStudents and entryWithdrawalData
+  activeStudentsData.forEach((studentDataArray, studentId) => {
+    if (entryWithdrawalData.has(studentId)) {
+      const entryWithdrawalArray = entryWithdrawalData.get(studentId);
+      // Check if the "Withdrawal Code" value is an empty string
+      if (entryWithdrawalArray[0]["Withdrawal Code"] === "") {
+        result.set(studentId, {
+          ...studentDataArray,
+          entryWithdrawal: entryWithdrawalArray,
+        });
+      }
+    }
+    return result;
+  });
+
+  // Perform a left join with the withdrawn students
+  const withdrawnOuterJoinMap = new Map();
+  activeStudentsData.forEach((studentDataArray, studentId) => {
+    if (!entryWithdrawalData.has(studentId)) {
+      withdrawnOuterJoinMap.set(studentId, studentDataArray);
+    }
+    return withdrawnOuterJoinMap;
+  });
+
+  // Append to the "Withdrawn" sheet
+  const withdrawnSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
+  withdrawnOuterJoinMap.forEach((studentDataArray, studentId) => {
+    studentDataArray.forEach((studentData) => {
+        withdrawnSheet.appendRow(Object.values(studentData));
+    });
+  });
+
   // First left join with registrations
-  activeStudents.forEach((studentData, studentId) => {
+  activeStudentsData.forEach((studentData, studentId) => {
     // Get registration data for the current student or null if not found
-    const registrationData = registrations.get(studentId) || null;
+    const registrationData = registrationsData.get(studentId) || null;
     // Merge student data with registration data and store it in the result map
     result.set(studentId, { ...studentData, registration: registrationData });
   });
