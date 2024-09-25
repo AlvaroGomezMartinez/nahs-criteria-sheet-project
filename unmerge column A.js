@@ -1,3 +1,11 @@
+/**
+ * This is a helper function that unmerges all of the merged cells in column A
+ * of the "Active" sheet and fills the unmerged cells with the value of the top
+ * cell in the merged range.
+ * 
+ * @file unmerge column A.js
+ * @return {void}
+ */
 function unmergeAndFillColumnA() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active");
   const range = sheet.getRange("A2:A" + sheet.getLastRow()); // Adjust range to exclude header
