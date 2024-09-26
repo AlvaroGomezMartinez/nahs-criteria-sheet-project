@@ -1,5 +1,5 @@
 /**
- * @author Alvaro Gomez[alvaro.gomez@nisd.net], Academic Technology Coach
+ * @author Alvaro Gomez<alvaro.gomez@nisd.net>, Academic Technology Coach
  * Office: 210-397-9408
  * Mobile: 210-363-1577
  *
