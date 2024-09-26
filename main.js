@@ -28,18 +28,21 @@ function main() {
   // Prepare the "Active" sheet for data loading and joining, by unmerging the cells in column A
   unmergeAndFillColumnA();
 
-  // Load data for active students, registration, attendance, and enrollment
+  // Load data and build the initial maps for active students, registration, attendance, and enrollment
   const activeStudentsData = loadActiveStudentsData();
   const registrationsData = loadRegistrationsData();
   const attendanceData = loadStudentAttendanceData();
   const entryWithdrawalData = loadEntryWithdrawalData();
 
-  // Map to store the first merged result
+  /**
+   * This is the 1st join operation.
+   * 
+   * This is an inner join between activeStudentsData and entryWithdrawalData.
+   * The result is a map of students who were already in the "Active" sheet and were also
+   * active in the entryWithdrawalData map.
+   */
   const leftoverActiveStudentDataMap = new Map();
-
-  // First join. This is an inner join between activeStudentsData and entryWithdrawalData.
-  // The result is a map of students who were already in the "Active" sheet and were also
-  // active in the entryWithdrawalData map.
+  
   activeStudentsData.forEach((studentDataArray, studentId) => {
     if (entryWithdrawalData.has(studentId)) {
       const entryWithdrawalArray = entryWithdrawalData.get(studentId);
@@ -54,9 +57,15 @@ function main() {
     return leftoverActiveStudentDataMap;
   });
 
-  // Perform a left join with activeStudentsData and entryWithdrawalData.
-  // The result is a map of students who are not in the entryWithdrawalData map,
-  // meaning that it pulls out students withdrawn from NAHS.
+
+  /**
+   * This is the 2nd join operation.
+   * 
+   * This is a left join between activeStudentsData and entryWithdrawalData.
+   * The result is a map of students not in the entryWithdrawalData map,
+   * meaning, that it pulls out students withdrawn from NAHS. The results
+   * are added to the "Withdrawn" sheet.
+   */
   const withdrawnOuterJoinMap = new Map();
 
   activeStudentsData.forEach((studentDataArray, studentId) => {
@@ -66,30 +75,36 @@ function main() {
     return withdrawnOuterJoinMap;
   });
 
-  // Clear data in "Withdrawn"
-  const withdrawnSheet =
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
-  const lastRow = withdrawnSheet.getLastRow(); // Find the last row with data
-  const lastColumn = withdrawnSheet.getLastColumn(); // Find the last column with data
-  withdrawnSheet.getRange(2, 1, lastRow - 1, lastColumn).clear(); // Clear from row 2 down
+  // The next four statements clear data in "Withdrawn"
+  const withdrawnSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
+  const lastRow = withdrawnSheet.getLastRow();
+  const lastColumn = withdrawnSheet.getLastColumn();
+  withdrawnSheet.getRange(2, 1, lastRow - 1, lastColumn).clear(); // Clear data from row 2 down
 
-  // Add the updated data to "Withdrawn"
+  // Add the withdrawnOuterJoinMap data to "Withdrawn"
   withdrawnOuterJoinMap.forEach((studentDataArray, studentId) => {
     studentDataArray.forEach((studentData) => {
       withdrawnSheet.appendRow(Object.values(studentData));
     });
   });
 
-  // Perform a right join between the leftoverActiveStudentDataMap and entryWithdrawalData
-  // The purpose of this join is to create a list of current active students and those who
-  // recently enrolled at NAHS.
+  
+  /**
+   * This is the 3rd join operation.
+   * 
+   * This is a left join between leftoverActiveStudentDataMap and entryWithdrawalData.
+   * The purpose of this join is to create a list of active students from the
+   * entryWithdrawalData map and those already on the "Active" sheet. This join will
+   * add newly enrolled students and keep the data that's already been entered by
+   * any user in the "Active" sheet's data.
+   */
   const updatedActiveStudentDataMap = new Map();
 
   // Iterate through entryWithdrawalData (Table B)
   entryWithdrawalData.forEach((entryDataArray, studentId) => {
     let withdrawnData = null;
 
-    // Loop through withdrawnStudentDataMap (Table A) and find the studentId in the array keys
+    // Loop through leftoverActiveStudentDataMap (Table A) and find the studentId in the array keys
     leftoverActiveStudentDataMap.forEach((dataArray, keyArray) => {
       // Check if studentId exists in the keyArray
       if (keyArray.includes(studentId)) {
@@ -104,7 +119,14 @@ function main() {
     });
   });
 
-  // Perform a right join with updatedActiveStudentDataMap and registrationsData
+
+  /**
+   * This is the 4th join operation.
+   * 
+   * Perform a left join with updatedActiveStudentDataMap and registrationsData.
+   * The purpose of this join is to add the data from registrationsData to
+   * updatedActiveStudentDataMap to help build the updated "Active" sheet.
+   */
   const updatedUpdatedActiveStudentDataMap = new Map();
 
   updatedActiveStudentDataMap.forEach((studentData, studentId) => {
@@ -117,6 +139,15 @@ function main() {
     });
   });
 
+  
+  /**
+   * This is the 5th join operation.
+   * 
+   * Perform a left join updatedUpdatedActiveStudentDataMap and attendanceData.
+   * The purpose of this join is to add the data from the
+   * "Alt_HS_Attendance_Enrollment_Count" sheet to help build the
+   * updated "Active" sheet's data.
+   */
   // Second left join with attendanceData
   const updatedUpdatedUpdatedActiveStudentDataMap = new Map();
 
