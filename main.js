@@ -166,8 +166,8 @@ function main() {
 
 
   // Write the merged result to the "Active" sheet
-  writeToSheet(result);
+  writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap);
 
   // Return the merged data map
-  return result;
+  return updatedUpdatedUpdatedActiveStudentDataMap;
 }
