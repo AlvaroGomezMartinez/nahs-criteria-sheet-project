@@ -1,46 +1,46 @@
 /**
  * Writes the data from updatedUpdatedUpdatedActiveStudentDataMap to the "Active" sheet.
  */
-function writeToActiveSheet() {
+function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
   const activeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active");
-  
+
   // Clear existing data from Row 2 downwards
   const lastRow = activeSheet.getLastRow();
   if (lastRow > 1) {
-    activeSheet.getRange(2, 1, lastRow - 1, activeSheet.getLastColumn()).clear();
+    activeSheet
+      .getRange(2, 1, lastRow - 1, activeSheet.getLastColumn())
+      .clear();
   }
 
   // Prepare the data in the desired order
   const outputData = [];
-  
+
   updatedUpdatedUpdatedActiveStudentDataMap.forEach((studentData, studentId) => {
     // Extract the needed data fields in the specified order
     outputData.push([
-      // Name
-      // Home Campus
-      // Grade
+      studentData.entryData ? studentData.entryData[0]["Student Name"] : null, // Name
+      studentData.registration ? studentData.registration[0]["Home Campus"] : null, // Home Campus
+      studentData.entryData ? studentData.entryData[0]["Grade"] : null, // Grade
       studentId, // Student ID
-      // Offense
-      // Start Date
-      // Placement Days
-      // Days in Att
-      // Days in Enrl
-      // Estimated Days Left
-      // Review Date
-      // Estimated Exit Day
-      // Recidivist
-      // Eligibility
-      // Educational Factors
-      // Behavior Contract
-      studentData.entryData[0]["Some Field"], // Example field from entryData
-      studentData.withdrawnData ? studentData.withdrawnData[0]["Another Field"] : null, // Example field from withdrawnData
-      studentData.registration ? studentData.registration["Reg Field"] : null, // Example field from registration
-      studentData.attendance ? studentData.attendance["Att Field"] : null, // Example field from attendance
+      studentData.registration ? studentData.registration[0]["Placement Offense"] : null, // Offense
+      studentData.entryData ? studentData.entryData[0]["Entry Date"] : null, // Start Date
+      studentData.registration ? studentData.registration[0]["Placement Days"] : null, // Placement Days
+      studentData.attendance ? studentData.attendance[0][4] : null, // Days in Att
+      studentData.attendance ? studentData.attendance[0][5] : null, // Days in Enrl
+      null, // Estimated Days Left
+      studentData.withdrawnData ? studentData.withdrawnData[0]["Review Date"] : null, // Review Date
+      null, // Estimated Exit Day
+      null, // Recidivist
+      studentData.registration ? studentData.registration[0]["Eligibilty"] : null, // Eligibility
+      studentData.registration ? studentData.registration[0]["Educational Factors"] : null, // Educational Factors
+      studentData.registration ? studentData.registration[0]["Behavior Contract"] : null, // Behavior Contract
     ]);
   });
 
   // Write the prepared data to the "Active" sheet starting from Row 2
   if (outputData.length > 0) {
-    activeSheet.getRange(2, 1, outputData.length, outputData[0].length).setValues(outputData);
+    activeSheet
+      .getRange(2, 1, outputData.length, outputData[0].length)
+      .setValues(outputData);
   }
 }
