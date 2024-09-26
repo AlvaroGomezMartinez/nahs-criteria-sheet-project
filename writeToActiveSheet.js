@@ -25,6 +25,17 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
       const formattedGrade = gradeString
         ? gradeString.split("-")[0].trim().replace(/^0+/, "")
         : null;
+      // Formats the Start Date string to change it from "9/19/2024 0:00:00" to "9/19/2024"
+      const entryDateString = studentData.entryData
+        ? studentData.entryData[0]["Entry Date"]
+        : null;
+      const formattedEntryDate = entryDateString
+        ? new Date(entryDateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })
+        : null;
       // Extract the needed data fields in the specified order
       outputData.push([
         studentData.entryData ? studentData.entryData[0]["Student Name"] : null, // Name
@@ -37,7 +48,7 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
         studentData.registration
           ? studentData.registration[0]["Placement Offense"]
           : null, // Offense
-        studentData.entryData ? studentData.entryData[0]["Entry Date"] : null, // Start Date
+        formattedEntryDate, // Start Date
         studentData.registration
           ? studentData.registration[0]["Placement Days"]
           : null, // Placement Days
