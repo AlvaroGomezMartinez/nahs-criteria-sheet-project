@@ -61,8 +61,12 @@ function main() {
     return withdrawnOuterJoinMap;
   });
 
-  // Append to the "Withdrawn" sheet
+  // Clear and add to the data to the "Withdrawn" sheet
   const withdrawnSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
+  const lastRow = withdrawnSheet.getLastRow(); // Find the last row with data
+  const lastColumn = withdrawnSheet.getLastColumn(); // Find the last column with data
+  withdrawnSheet.getRange(2, 1, lastRow - 1, lastColumn).clear(); // Clear from row 2 down
+  
   withdrawnOuterJoinMap.forEach((studentDataArray, studentId) => {
     studentDataArray.forEach((studentData) => {
         withdrawnSheet.appendRow(Object.values(studentData));
