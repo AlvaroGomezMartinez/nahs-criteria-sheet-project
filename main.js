@@ -61,7 +61,7 @@ function main() {
     return withdrawnOuterJoinMap;
   });
 
-  // Clear and add to the data to the "Withdrawn" sheet
+  // Clear data in "Withdrawn" and add the updated data
   const withdrawnSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
   const lastRow = withdrawnSheet.getLastRow(); // Find the last row with data
   const lastColumn = withdrawnSheet.getLastColumn(); // Find the last column with data
