@@ -168,6 +168,9 @@ function main() {
   // Write the merged result to the "Active" sheet
   writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap);
 
+  // Update the counselor sheets
+  pushRowsToCounselorSheet();
+
   // Return the merged data map
   return updatedUpdatedUpdatedActiveStudentDataMap;
 }
