@@ -1,21 +1,3 @@
-/** Add a trigger so the onEdit function runs when the "Active" sheet is edited.
- * @todo Go to Triggers.
- * @todo Click on + Add Trigger.
- * @todo Choose onEdit from the function dropdown.
- * @todo Set the event type to "On edit".
- * @todo Save the trigger.
-*/
-
-// function onEdit(e) {
-//     var sheet = e.source.getActiveSheet();
-//     if (sheet.getName() === "Active") {
-//         var range = e.range;
-//         if (range.getLastRow() > sheet.getLastRow() - 1) {
-//             pushRowsToCounselorSheet();
-//         }
-//     }
-// }
-
 /**
  * This function pushes the data from the "Active" sheet to each counselor's caseload sheet.
  */
