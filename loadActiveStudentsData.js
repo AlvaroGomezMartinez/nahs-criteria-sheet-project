@@ -33,6 +33,6 @@ function loadActiveStudentsData() {
     }
   }
 
-  //   Logger.log(`Total entries in the Active Student Data Map: ${activeStudentDataMap.size}`);
+  // Logger.log(`Total entries in the Active Student Data Map: ${activeStudentDataMap.size}`);
   return activeStudentDataMap;
 }
