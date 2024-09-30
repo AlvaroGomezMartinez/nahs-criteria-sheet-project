@@ -38,7 +38,7 @@ function loadRegistrationsData() {
         registrationsMap.set(studentId, [rowData]);
       }
     } else {
-      Logger.log(`Empty student ID at row ${i + 1}`);
+      Logger.log(`Registrations SY 24.25: Empty student ID at row ${i + 1}`);
     }
   }
 
