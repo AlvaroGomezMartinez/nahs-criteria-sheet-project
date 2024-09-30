@@ -28,7 +28,7 @@ function loadStudentAttendanceData() {
       studentID = String(studentID).trim(); // Convert to string and trim spaces
       studentAttendanceDataMap.set(studentID, [rowData]);
     } else {
-      Logger.log(`Empty student ID at row ${i + 1}`);
+      Logger.log(`Alt_HS_Attendance_Enrollment_Count: Empty student ID at row ${i + 1}`);
     }
   }
 
