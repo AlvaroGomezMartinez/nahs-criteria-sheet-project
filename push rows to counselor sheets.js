@@ -77,16 +77,23 @@ for (let i = 0; i < values.length; i++) {
   
 /** Go to wsHensley and check the values of each row in the range D2:D against the values in the hensleyCaseLoad array. If the values are different, append the new values to the bottom of the sheet.
 */
-const wsHensleyRange = wsHensley.getRange(2, 4, wsHensley.getLastRow() - 1, 1);
-const wsHensleyValues = wsHensleyRange.getValues().flat();
-let hensleyValuesChanged = false;
+if (lastRow > 1) {
+  const wsHensleyRange = wsHensley.getRange(
+    2,
+    4,
+    wsHensley.getLastRow() - 1,
+    1
+  );
+  const wsHensleyValues = wsHensleyRange.getValues().flat();
+  let hensleyValuesChanged = false;
 
-for (let i = 0; i < hensleyCaseLoad.length; i++) {
+  for (let i = 0; i < hensleyCaseLoad.length; i++) {
     if (!wsHensleyValues.includes(Number(hensleyCaseLoad[i][3]))) {
-        wsHensley.appendRow(hensleyCaseLoad[i]);
-        hensleyValuesChanged = true;
+      wsHensley.appendRow(hensleyCaseLoad[i]);
+      hensleyValuesChanged = true;
     }
-}
+  }
+} else { Logger.log("No data in Hensley sheet."); }
 
 const wsRodriguezRange = wsRodriguez.getRange(2, 4, wsRodriguez.getLastRow() - 1, 1);
 const wsRodriguezValues = wsRodriguezRange.getValues().flat();
