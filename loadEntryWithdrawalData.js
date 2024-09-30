@@ -15,6 +15,7 @@ function loadEntryWithdrawalData() {
     .getValues();
 
   const entryWithdrawalMap = new Map();
+  const occurrencesMap = new Map(); // Map to track occurrences of student IDs
 
   const headers = entryWithdrawal[0];
 
@@ -29,15 +30,28 @@ function loadEntryWithdrawalData() {
     let studentId = row[1]; // The student ID is in the second column (index 1)
     if (studentId) {
       studentId = String(studentId).trim();
+
+      // Track occurrences of student IDs
+      occurrencesMap.set(studentId, (occurrencesMap.get(studentId) || 0) + 1);
+
       if (entryWithdrawalMap.has(studentId)) {
         entryWithdrawalMap.get(studentId).push(rowData);
       } else {
         entryWithdrawalMap.set(studentId, [rowData]);
       }
     } else {
-      Logger.log(`Empty student ID at row ${i + 1}`);
+      Logger.log(`Entry_Withdrawal: Empty student ID at row ${i + 1}`);
     }
   }
+
+
+  // Add the recidivist status to each student's data
+  entryWithdrawalMap.forEach((dataArray, studentId) => {
+    const recidivist = occurrencesMap.get(studentId) > 1 ? 'YES' : 'NO'; // Determine recidivist status
+    dataArray.forEach(rowData => {
+      rowData.recidivist = recidivist; // Add the recidivist value to each entry
+    });
+  });
 
   // Logger.log(`Total entries in Entry Withdrawal Map: ${entryWithdrawalMap.size}`);
   return entryWithdrawalMap;
