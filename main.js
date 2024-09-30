@@ -167,8 +167,6 @@ function main() {
     });
   });
 
-
-
   // Write the merged result to the "Active" sheet
   writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap);
 
