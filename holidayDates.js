@@ -1,4 +1,12 @@
-// Array of the 24-25 NISD Holiday Dates
+/**
+ * Array of NISD holiday dates, used to exclude non-school days from calculations
+ * for determining the expected student exit date from DAEP.
+ * 
+ * Each date in the array is formatted as 'MM/DD/YYYY' and represents a school holiday or break
+ * during which no classes are held.
+ * 
+ * @constant {string[]} holidayDates - An array of strings, where each string is a holiday date.
+ */
 const holidayDates = [
   '6/7/2024',
   '6/8/2024',
