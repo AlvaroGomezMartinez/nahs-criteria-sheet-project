@@ -7,7 +7,6 @@
  * a spreadsheet that provides information to NAHS Administrators
  * and counselors.
  *
- *
  */
 
 /**
