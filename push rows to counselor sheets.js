@@ -23,8 +23,20 @@ function pushRowsToCounselorSheet() {
         }
     }
 
-    wsHensley.getRange(2, 1, hensleyCaseLoad.length, hensleyCaseLoad[0].length).setValues(hensleyCaseLoad);
-    wsRodriguez.getRange(2, 1, rodriguezCaseLoad.length, rodriguezCaseLoad[0].length).setValues(rodriguezCaseLoad);
+
+    // wsHensley.getRange(2, 1, hensleyCaseLoad.length, hensleyCaseLoad[0].length).setValues(hensleyCaseLoad);
+    if (hensleyCaseLoad.length > 0) {
+      wsHensley.getRange(2, 1, hensleyCaseLoad.length, hensleyCaseLoad[0].length).setValues(hensleyCaseLoad);
+    } else {
+      Logger.log("No data for Hensley case load.");
+    }
+
+    // wsRodriguez.getRange(2, 1, rodriguezCaseLoad.length, rodriguezCaseLoad[0].length).setValues(rodriguezCaseLoad);
+    if (rodriguezCaseLoad.length > 0) {
+      wsRodriguez.getRange(2, 1, rodriguezCaseLoad.length, rodriguezCaseLoad[0].length).setValues(rodriguezCaseLoad);
+    } else {
+      Logger.log("No data for Rodriguez case load.");
+    }
 }
 
 const ss = SpreadsheetApp.getActiveSpreadsheet();
