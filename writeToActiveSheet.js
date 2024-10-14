@@ -34,7 +34,7 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
   }
 
   function calculateExpectedWithdrawDate(studentData) {
-    const formattedEntryDate = studentData.entryData ? studentData.entryData[0]["Entry Date"] : null;
+    const formattedEntryDate = studentData.entryData ? studentData.entryData[0]["Start Date"] : null;
     const placementDays = studentData.registration ? studentData.registration[0]["Placement Days"] : null;
     const daysInEnrl = studentData.attendance ? studentData.attendance[0][5] : null; // Days in Enrl
     const daysInAtt = studentData.attendance ? studentData.attendance[0][4] : null; // Days in Att
@@ -67,9 +67,9 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
         return; // Skip this student if entry data is not available
       }
 
-      const formattedEntryDate = entryData["Entry Date"];
+      const formattedEntryDate = entryData["Start Date"];
       const gradeString = entryData["Grade"];
-      const formattedGrade = gradeString ? gradeString.split("-")[0].trim().replace(/^0+/, "") : null;
+      // const formattedGrade = gradeString ? gradeString.split("-")[0].trim().replace(/^0+/, "") : null;
 
       // Validate the entry date
       const entryDateString = new Date(formattedEntryDate);
@@ -88,9 +88,10 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
 
       // Extract the needed data fields in the specified order
       outputData.push([
-        entryData["Student Name"], // Name
+        entryData["Name"], // Name
         studentData.registration ? studentData.registration[0]["Home Campus"] : null, // Home Campus
-        formattedGrade, // Grade
+        // formattedGrade, // Grade
+        gradeString, // Grade
         studentId, // Student ID
         studentData.registration ? studentData.registration[0]["Placement Offense"] : null, // Offense
         formattedEntryDate, // Start Date
@@ -100,7 +101,7 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
         estimatedDaysLeft, // Estimated Days Left
         studentData.withdrawnData ? studentData.withdrawnData[0]["Review Date"] : null, // Review Date
         estimatedExitDay || null, // Estimated Exit Day
-        studentData.entryData ? studentData.entryData[0]["recidivist"] : null, // Recidivist
+        studentData.entryData ? studentData.entryData[0]["Recidivist"] : null, // Recidivist
         studentData.registration ? studentData.registration[0]["Eligibilty"] : null, // Eligibility
         studentData.registration ? studentData.registration[0]["Educational Factors"] : null, // Educational Factors
         studentData.registration ? studentData.registration[0]["Behavior Contract"] : null, // Behavior Contract
@@ -113,4 +114,5 @@ function writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap) {
       .getRange(2, 1, outputData.length, outputData[0].length)
       .setValues(outputData);
   }
+
 }
