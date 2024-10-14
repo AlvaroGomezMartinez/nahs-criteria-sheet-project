@@ -103,12 +103,12 @@ function main() {
    */
   const updatedActiveStudentDataMap = new Map();
 
-  // Iterate through entryWithdrawalData (Table B)
-  entryWithdrawalData.forEach((entryDataArray, studentId) => {
+  // Iterate through leftoverActiveStudentDataMap (Table B)
+  leftoverActiveStudentDataMap.forEach((entryDataArray, studentId) => {
     let withdrawnData = null;
 
-    // Loop through leftoverActiveStudentDataMap (Table A) and find the studentId in the array keys
-    leftoverActiveStudentDataMap.forEach((dataArray, keyArray) => {
+    // Loop through entryWithdrawalData (Table A) and find the studentId in the array keys
+    entryWithdrawalData.forEach((dataArray, keyArray) => {
       // Check if studentId exists in the keyArray
       if (keyArray.includes(studentId)) {
         withdrawnData = dataArray; // Get the corresponding data for the student
