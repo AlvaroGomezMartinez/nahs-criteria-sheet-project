@@ -6,7 +6,19 @@
  * @description The objective of this project is to create
  * a spreadsheet that provides information to NAHS Administrators
  * and counselors.
- *
+ * 
+ * Latest updates made on: 10/31/24
+ * 
+ * TODO: Create unit tests for:
+ *          1. determining the Estimated Days Left
+ *          2. handling blanks from the Alt_HS_Enrollment_Count
+ *          3. handling blanks from Registrations sheet.
+ *          The statements that calculate the data are in the writeToActiveSheet.gs file
+ * TODO: Verify the formula that updates the counsleor sheets outputs accurately; update
+ *       it if necessary.
+ * TODO: Update the function that pushes data to Review_Date. Currently it only
+ *       pushes data to it, it needs to pull and update the Review Date column
+ *       in Active.
  */
 
 /**
@@ -28,6 +40,7 @@ function main() {
   unmergeAndFillColumnA();
 
   // Load data and build the initial maps for active students, registration, attendance, and enrollment
+  const reviewData = loadReviewDateData();
   const activeStudentsData = loadActiveStudentsData();
   const registrationsData = loadRegistrationsData();
   const attendanceData = loadStudentAttendanceData();
@@ -36,58 +49,69 @@ function main() {
   /**
    * This is the 1st join operation.
    * 
-   * This is an inner join between activeStudentsData and entryWithdrawalData.
-   * The result is a map of students who were already in the "Active" sheet and were also
+   * This is a left join between activeStudentsData and entryWithdrawalData.
+   * The result is a map of students who are listed in Active and were also
    * active in the entryWithdrawalData map.
    */
   const leftoverActiveStudentDataMap = new Map();
-  
+  // Step 1: Add all entries from activeStudentsData to the result map
   activeStudentsData.forEach((studentDataArray, studentId) => {
-    if (entryWithdrawalData.has(studentId)) {
-      const entryWithdrawalArray = entryWithdrawalData.get(studentId);
-      // Check if the "Withdrawal Code" value is an empty string
-      if (entryWithdrawalArray[0]["Withdrawal Code"] === "") {
-        leftoverActiveStudentDataMap.set(studentId, {
-          ...studentDataArray,
-          entryWithdrawal: entryWithdrawalArray,
-        });
-      }
-    }
-    return leftoverActiveStudentDataMap;
+    leftoverActiveStudentDataMap.set(studentId, {
+      activeData: studentDataArray[0],
+      withdrawnData: null, // Initialize withdrawnData as null
+    });
   });
 
+  // Step 2: Add or update entries in leftoverActiveStudentDataMap using entryWithdrawalData
+  entryWithdrawalData.forEach((entryWithdrawalArray, studentId) => {
+    // Get the last element of entryWithdrawalArray
+    const lastEntry = entryWithdrawalArray[entryWithdrawalArray.length - 1];
+
+    // Check if "Withdrawal Code" is an empty string
+    if (lastEntry["Withdrawal Code"] === "") {
+      if (leftoverActiveStudentDataMap.has(studentId)) {
+        // If studentId exists, add lastEntry to withdrawnData array
+        const existingData = leftoverActiveStudentDataMap.get(studentId);
+        const updatedWithdrawnData = existingData.withdrawnData || []; // Use existing withdrawnData or initialize an array
+        updatedWithdrawnData.push(lastEntry);
+
+        leftoverActiveStudentDataMap.set(studentId, {
+          ...existingData,
+          withdrawnData: updatedWithdrawnData, // Update withdrawnData without changing activeData
+        });
+      } else {
+        // If studentId does not exist, add a new entry with lastEntry in withdrawnData
+        leftoverActiveStudentDataMap.set(studentId, {
+          activeData: activeStudentsData.get(studentId) || null, // Keep activeData if available, or set to null
+          withdrawnData: [lastEntry], // Initialize withdrawnData as an array containing lastEntry
+        });
+      }
+      console.log(`Added lastEntry to withdrawnData for studentId ${studentId}`);
+    } else {
+      console.log(`Skipping studentId ${studentId} - Reason: Withdrawal Code is not empty`);
+    }
+  });
 
   /**
    * This is the 2nd join operation.
    * 
-   * This is a left join between activeStudentsData and entryWithdrawalData.
-   * The result is a map of students not in the entryWithdrawalData map,
-   * meaning, that it pulls out students withdrawn from NAHS. The results
-   * are added to the "Withdrawn" sheet.
+   * Perform a left join with leftoverActiveStudentDataMap and registrationsData.
+   * The purpose of this join is to add the data from registrationsData to
+   * updatedActiveStudentDataMap to help build the updated "Active" sheet.
    */
-  const withdrawnOuterJoinMap = new Map();
+  const updatedUpdatedActiveStudentDataMap = new Map();
 
-  activeStudentsData.forEach((studentDataArray, studentId) => {
-    if (!entryWithdrawalData.has(studentId)) {
-      withdrawnOuterJoinMap.set(studentId, studentDataArray);
-    }
-    return withdrawnOuterJoinMap;
-  });
+  leftoverActiveStudentDataMap.forEach((studentData, studentId) => {
+    // Get registration data for the current student or null if not found
+    const registrationData = registrationsData.get(studentId) || null;
 
-  // The next four statements clear data in "Withdrawn"
-  const withdrawnSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
-  const lastRow = withdrawnSheet.getLastRow();
-  const lastColumn = withdrawnSheet.getLastColumn();
-  // withdrawnSheet.getRange(2, 1, lastRow - 1, lastColumn).clear(); // Clear data from row 2 down
+    // Get the last element of registrationsData map, so that we have the latest enrollment data for repeaters
+    const lastEntry = registrationData ? registrationData[registrationData.length - 1] : null;
 
-  // Add the withdrawnOuterJoinMap data to "Withdrawn"
-  if (lastRow > 1) {
-    withdrawnSheet.getRange(2, 1, lastRow - 1, lastColumn).clear(); // Clear data from row 2 down
-  }
-  withdrawnOuterJoinMap.forEach((studentDataArray, studentId) => {
-    studentDataArray.forEach((studentData) => {
-      Logger.log(`Appending data for student ID: ${studentId}`, studentData); // Debug log
-      withdrawnSheet.appendRow(Object.values(studentData));
+    // Merge student data with registration data and store it in the updatedUpdatedActiveStudentDataMap map
+    updatedUpdatedActiveStudentDataMap.set(studentId, {
+      ...studentData,
+      registration: lastEntry,
     });
   });
 
@@ -95,30 +119,40 @@ function main() {
   /**
    * This is the 3rd join operation.
    * 
-   * This is a left join between leftoverActiveStudentDataMap and entryWithdrawalData.
-   * The purpose of this join is to create a list of active students from the
-   * entryWithdrawalData map and those already on the "Active" sheet. This join will
-   * add newly enrolled students and keep the data that's already been entered by
-   * any user in the "Active" sheet's data.
+   * Perform a left join updatedUpdatedActiveStudentDataMap and attendanceData.
+   * The purpose of this join is to add the data from the
+   * "Alt_HS_Attendance_Enrollment_Count" sheet to help build the
+   * updated "Active" sheet's data.
    */
-  const updatedActiveStudentDataMap = new Map();
+  const updatedUpdatedUpdatedActiveStudentDataMap = new Map();
 
-  // Iterate through leftoverActiveStudentDataMap (Table B)
-  leftoverActiveStudentDataMap.forEach((entryDataArray, studentId) => {
-    let withdrawnData = null;
+  const HEADINGS = ["BUILDING", "CAMPUS", "STU ID", "STUDENT", "DAYS IN ATT", "DAYS IN Enrl", "Present", "ALL_"];
 
-    // Loop through entryWithdrawalData (Table A) and find the studentId in the array keys
-    entryWithdrawalData.forEach((dataArray, keyArray) => {
-      // Check if studentId exists in the keyArray
-      if (keyArray.includes(studentId)) {
-        withdrawnData = dataArray; // Get the corresponding data for the student
-      }
-    });
+  updatedUpdatedActiveStudentDataMap.forEach((studentData, studentId) => {
+    const normalizedStudentId = String(studentId).trim();
+    let attendance = attendanceData.get(normalizedStudentId) || null;
 
-    // Push the results to updatedActiveStudentDataMap
-    updatedActiveStudentDataMap.set(studentId, {
-      entryData: entryDataArray,
-      withdrawnData: withdrawnData, // If found, otherwise it remains null
+    // Initialize a single attendance object to store expanded attendance data
+    const attendanceObject = {};
+
+    if (attendance && Array.isArray(attendance)) {
+      attendance.forEach((entry) => {
+        // Map each entry to an object with fields from HEADINGS
+        if (Array.isArray(entry)) {
+          entry.forEach((value, idx) => {
+            attendanceObject[HEADINGS[idx] || `field${idx + 1}`] = value;
+          });
+        } else {
+          // If entry is already an object, merge it as-is
+          Object.assign(attendanceObject, entry);
+        }
+      });
+    }
+
+    // Merge the existing student data with the single attendance object
+    updatedUpdatedUpdatedActiveStudentDataMap.set(studentId, {
+      ...studentData,
+      attendance: attendanceObject,
     });
   });
 
@@ -126,52 +160,49 @@ function main() {
   /**
    * This is the 4th join operation.
    * 
-   * Perform a left join with updatedActiveStudentDataMap and registrationsData.
-   * The purpose of this join is to add the data from registrationsData to
-   * updatedActiveStudentDataMap to help build the updated "Active" sheet.
+   * Perform a left join with updatedUpdatedUpdatedActiveStudentDataMap and reviewDateDataMap.
+   * The purpose of this join is to add the data from reviewDateData to
+   * updatedUpdateUpdateActiveStudentDataMap to help build the updated "Active" sheet.
    */
-  const updatedUpdatedActiveStudentDataMap = new Map();
+    const updatedUpdatedUpdatedUpdatedActiveStudentDataMap = new Map();
 
-  updatedActiveStudentDataMap.forEach((studentData, studentId) => {
-    // Get registration data for the current student or null if not found
-    const registrationData = registrationsData.get(studentId) || null;
-    // Merge student data with registration data and store it in the updatedUpdatedActiveStudentDataMap map
-    updatedUpdatedActiveStudentDataMap.set(studentId, {
-      ...studentData,
-      registration: registrationData,
+    updatedUpdatedUpdatedActiveStudentDataMap.forEach((studentData, studentId) => {
+      // Get reviewDate data for the current student or null if not found
+      const reviewDataArray = reviewData.get(studentId) || null;
+
+      // Initialize an empty object to hold filtered review data
+      let reviewDataObject = {};
+
+      // If reviewDataArray is an array, only extract "Name", "ID", and "Review Date"
+      if (Array.isArray(reviewDataArray)) {
+        reviewDataArray.forEach(item => {
+          if (item.Name) reviewDataObject.Name = item.Name;
+          if (item.ID) reviewDataObject.ID = item.ID;
+          if (item["Review Date"]) reviewDataObject["Review Date"] = item["Review Date"];
+        });
+      } else {
+        // If it's not an array, keep it as-is
+        reviewDataObject = reviewDataArray;
+      }
+
+      // Merge student data with the filtered reviewDataObject and store in updated map
+      updatedUpdatedUpdatedUpdatedActiveStudentDataMap.set(studentId, {
+        ...studentData,
+        review: reviewDataObject,
+      });
     });
-  });
 
-  
-  /**
-   * This is the 5th join operation.
-   * 
-   * Perform a left join updatedUpdatedActiveStudentDataMap and attendanceData.
-   * The purpose of this join is to add the data from the
-   * "Alt_HS_Attendance_Enrollment_Count" sheet to help build the
-   * updated "Active" sheet's data.
-   */
-  // Second left join with attendanceData
-  const updatedUpdatedUpdatedActiveStudentDataMap = new Map();
-
-  updatedUpdatedActiveStudentDataMap.forEach((studentData, studentId) => {
-    // Normalize the student ID to a string (in case it's not already)
-    const normalizedStudentId = String(studentId).trim();
-    // Get attendance data using the normalized ID or null if not found
-    const attendance = attendanceData.get(normalizedStudentId) || null;
-    // Merge the existing student data with attendance data
-    updatedUpdatedUpdatedActiveStudentDataMap.set(studentId, {
-      ...studentData,
-      attendance: attendance,
-    });
-  });
+  pushDataToReviewDateSheet(updatedUpdatedUpdatedUpdatedActiveStudentDataMap);
 
   // Write the merged result to the "Active" sheet
-  writeToActiveSheet(updatedUpdatedUpdatedActiveStudentDataMap);
+  writeToActiveSheet(updatedUpdatedUpdatedUpdatedActiveStudentDataMap);
 
   // Update the counselor sheets
   pushRowsToCounselorSheet();
 
+  // Add comment to cell A1 in each of the four sheets
+  addTimestampedCommentToSheets();
+
   // Return the merged data map
-  return updatedUpdatedUpdatedActiveStudentDataMap;
+  return updatedUpdatedUpdatedUpdatedActiveStudentDataMap;
 }
