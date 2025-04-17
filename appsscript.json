@@ -1,0 +1,24 @@
+{
+  "timeZone": "America/Chicago",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "QUnitGS2",
+        "libraryId": "1tXPhZmIyYiA_EMpTRJw0QpVGT5Pdb02PpOHCi9A9FFidblOc9CY_VLgG",
+        "version": "23"
+      },
+      {
+        "userSymbol": "NISDHolidayLibrary",
+        "version": "0",
+        "libraryId": "1OjYgamk2Sz8G1B4IOJKdWNM9-t6RwSJ_uq7nUJJO6h_7jSogTDT7CX10",
+        "developmentMode": true
+      }
+    ]
+  },
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "MYSELF"
+  }
+}
