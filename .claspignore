@@ -1,0 +1,6 @@
+# Ignore everything in subfolders
+**
+
+# But allow top-level files
+!*.js
+!appsscript.json
